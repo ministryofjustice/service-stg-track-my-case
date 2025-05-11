@@ -108,6 +108,13 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Set unique release name
+        id: set-release-name
+        run: |
+          BRANCH_NAME=$(echo "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | tr '/_' '-')
+          echo "RELEASE_NAME=${{ github.event.repository.name }}-${BRANCH_NAME}-${{ github.sha }}" >> $GITHUB_OUTPUT
+        shell: bash
+
       - name: Upgrade the Helm chart
         env:
           APP_ROLE_ARN: ${{ secrets.APP_ROLE_ARN }}
@@ -124,7 +131,7 @@ jobs:
           IP_RANGES: ${{ secrets.IP_RANGES }}
           KUBE_NAMESPACE: ${{ secrets.KUBE_NAMESPACE }}
           NEW_TAG_V: ${{ needs.build-push-dev.outputs.new_tag }}
-          RELEASE_NAME: ${{ github.event.repository.name }}-dev
+          RELEASE_NAME: ${{ steps.set-release-name.outputs.RELEASE_NAME }}
           SECRETS_CONTEXT:  ${{ toJson(secrets) }}
           VARS_CONTEXT:  ${{ toJson(vars) }}
         run: |
