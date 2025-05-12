@@ -109,7 +109,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Set unique release name
-        id: set-release-name
+        id: set-release-name-unique
         run: |
           BRANCH_NAME=$(echo "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | tr '/_' '-')
           echo "RELEASE_NAME=${{ github.event.repository.name }}-${BRANCH_NAME}-${{ github.sha }}" >> $GITHUB_OUTPUT
